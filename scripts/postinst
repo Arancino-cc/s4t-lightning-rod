@@ -1,5 +1,10 @@
 #!/bin/sh       
 
+if [ -z "$IPKG_INSTROOT" ]; then
+echo "Skipping Installation..."
+exit 0
+fi
+
 echo "Installing..."
 /usr/bin/npm install -g --unsafe https://github.com/PlayNetwork/node-statvfs/tarball/v3.0.0
 echo "--> 3rd-party dependencies installed."
