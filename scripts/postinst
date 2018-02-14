@@ -1,5 +1,6 @@
 #!/bin/sh       
 
+echo "IPKG_INSTROOT...""$IPKG_INSTROOT"
 if [ -z "$IPKG_INSTROOT" ]; then
 echo "Skipping Installation..."
 exit 0
