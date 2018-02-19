@@ -38,7 +38,7 @@ cp /usr/lib/node_modules/@mdslab/iotronic-lightning-rod/etc/cron.d/root_openwrt 
 echo " - crond configuration installed."
 
 
-echo "Rebooting..."
-reboot
+#echo "Rebooting..."
+#reboot
 
 
