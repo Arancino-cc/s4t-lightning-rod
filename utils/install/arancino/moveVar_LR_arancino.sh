@@ -8,6 +8,9 @@ mv /tmp/etc /var
 mv /tmp/lib /var
 mv /tmp/log /var
 mv /tmp/run /var
+mv /tmp/lock /var
+mv /tmp/state /var
+mv /tmp/tmp /var
 #cd /
 #mkdir var
 #cp -a /tmp/etc/ /var/
