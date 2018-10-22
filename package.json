@@ -12,7 +12,7 @@
     "uninstall": "./scripts/postuninst"
   },
   "dependencies": {
-    "autobahn": ">=0.9.9",
+    "autobahn": "17.5.2",
     "ws":"4.1.0",
     "connection-tester": ">=0.1.1",
     "fs-access": ">=1.0.1",
