@@ -54,7 +54,7 @@ reboot
 
 ##### Install required NodeJS modules via npm:
 ```
-npm install -g --unsafe gyp autobahn nconf @mdslab/wstun fuse-bindings requestify is-running connection-tester log4js@1.1.1 q fs-access mknod jsonfile md5 python-shell net lsof
+npm install -g --unsafe gyp autobahn@18.10.2 ws@6.1.0 nconf @mdslab/wstun fuse-bindings requestify is-running connection-tester log4js@1.1.1 q fs-access mknod jsonfile md5 python-shell net lsof
 npm install -g --unsafe https://github.com/PlayNetwork/node-statvfs/tarball/v3.0.0
 ```
 
@@ -116,23 +116,27 @@ In each module section (e.g. "plugins_manager", "services_manager", etc) to enab
 
 At the end of the installation process we have to execute the LR configuration script:
 ```
-$NODE_PATH/@mdslab/iotronic-lightning-rod/scripts/lr_configure.sh
+$NODE_PATH/@mdslab/iotronic-lightning-rod/scripts/lr_configure
 ```
-This script asks the following information:
+You can execute this script in interactive mode:
 ```
-* device type: 1 -> 'server', 2 -> 'arduino_yun', 3 -> 'raspberry_pi'
-
-* Board ID: UUID released by the registration process managed by IoTronic.
-
-* Board password: password to log in to Iotronic
-
-* IoTronic server IP
-
-* WAMP server URL
+$ ./lr_configure -i
 ```
 
+or in shell-mode passing the following parameters:
+```
+$ ./lr_configure <DEVICE_LAYOUT> <IOTRONIC_BOARD_ID> <IOTRONIC_BOARD_PASSWORD> <WAMP_URL> <WSTUN_URL>
 
+* <DEVICE_LAYOUT>: 1 -> 'server', 2 -> 'arduino_yun', 3 -> 'raspberry_pi', 4 -> 'kitra'
 
+* <IOTRONIC_BOARD_ID>: ID released by the registration process managed by IoTronic.
+
+* <IOTRONIC_BOARD_PASSWORD>: password to log in to Iotronic
+
+* <WAMP_URL>: Crossbar server URL
+
+* <WSTUN_URL>: WSTUN server URL
+```
 
 
 ## Start Lightning-rod

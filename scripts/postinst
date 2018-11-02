@@ -1,6 +1,44 @@
 #!/bin/sh       
 
 echo "Installing..."
+
+# Configure LR service script
+
+DISTRO=`cat /etc/*release | grep DISTRIB_RELEASE | cut -d "=" -f2`
+echo "--> OS Distribution: " $DISTRO
+
+service=`pidof systemd > /dev/null && echo "systemd" || echo "init.d"`
+echo "--> OS Service Manager: " $service
+
+if [ "$service" = "systemd" ];
+then
+
+    cp $NODE_PATH/@mdslab/iotronic-lightning-rod/etc/systemd/system/s4t-lightning-rod.service /etc/systemd/system/lightning-rod.service
+    sed -i "s|Environment=\"LIGHTNINGROD_HOME=\"|Environment=\"LIGHTNINGROD_HOME=$NODE_PATH/@mdslab/iotronic-lightning-rod\"|g" /etc/systemd/system/lightning-rod.service
+    chmod +x /etc/systemd/system/lightning-rod.service
+    systemctl daemon-reload
+
+else
+
+    if [ "$DISTRO" = "14.04" ]; then
+
+        chmod +x $NODE_PATH/@mdslab/iotronic-lightning-rod/lr-server.js
+        cp $NODE_PATH/@mdslab/iotronic-lightning-rod/etc/init.d/s4t-lightning-rod_ubu14 /etc/init.d/lightning-rod
+        chmod +x /etc/init.d/lightning-rod
+
+    else
+        cp $NODE_PATH/@mdslab/iotronic-lightning-rod/etc/init.d/s4t-lightning-rod_generic /etc/init.d/lightning-rod
+        chmod +x /etc/init.d/lightning-rod
+    fi
+
+fi
+
+
+
+
+
+
+# External packages instalaltion
 /usr/bin/npm install -g --unsafe https://github.com/PlayNetwork/node-statvfs/tarball/v3.0.0
 echo "--> 3rd-party dependencies installed."
 
@@ -42,7 +80,12 @@ fi
 
 IOTRONIC_AUTH="/etc/iotronic"
 
-if [ -d "$IOTRONIC_AUTH" ]; then
+if [ -d "$IOTRONIC_AUTH" ]; 
+then
+
+
+    LR_INSTALLED_VERSION=`cat /var/lib/iotronic/patches/package.json | grep \"version\" | awk '{print $2}' | tr -d , | tr -d \"`
+    logger -t DEBUG "Authentication settings file already present (LR v$LR_INSTALLED_VERSION)"
 
     rm_check=
     echo -n "Do you want to keep Lightning-rod authentication settings (in /etc/iotronic) ? (yes/no) "
@@ -52,17 +95,28 @@ if [ -d "$IOTRONIC_AUTH" ]; then
 
         echo "--> Lightning-rod authentication settings are save!"
 
+
+        if [ "$LR_INSTALLED_VERSION" == "2.2.0" ]; then
+                echo "--> APPLY THE 2.3.0 PATCH"
+                patch /etc/iotronic/authentication.json $NODE_PATH/@mdslab/iotronic-lightning-rod/utils/patches/authentication.patch
+        fi
+
+
+    elif [ "$rm_check" = "no" ]; then
+
+        mkdir -p /etc/iotronic/
+        cp $NODE_PATH/@mdslab/iotronic-lightning-rod/utils/templates/authentication.example.json /etc/iotronic/authentication.json
+
     fi
-
-fi
-
-if [ "$rm_check" = "no" ] || [ ! -d "$IOTRONIC_HOME" ]; then
-
+    
+else
+    
     mkdir -p /etc/iotronic/
-
     cp $NODE_PATH/@mdslab/iotronic-lightning-rod/utils/templates/authentication.example.json /etc/iotronic/authentication.json
-
+        
 fi
+
+
 
 
 
@@ -70,6 +124,10 @@ fi
 
 
 echo "Configuring..."
+
+# Configure logrotate
+cp $NODE_PATH/@mdslab/iotronic-lightning-rod/etc/logrotate.d/lightning-rod.log /etc/logrotate.d/lightning-rod.log
+
 
 # Set Environment variables
 if grep -Fq "IOTRONIC_HOME" /etc/environment
@@ -106,10 +164,15 @@ else
 fi
 
 
+# WSTUN setup: set bin path
+sed -i "s|\"bin\":.*|\"bin\": \"$NODE_PATH/@mdslab/wstun/bin/wstun.js\"|g" $IOTRONIC_AUTH/authentication.json
+
+
 echo "----------------------------------------------------------------------------------------------------------------"
-echo "After the installation execute lr_configure.sh script in order to complete the Lightning-rod configuration!"
-echo "--> $NODE_PATH/@mdslab/iotronic-lightning-rod/scripts/lr_configure.sh"
-chmod +x $NODE_PATH/@mdslab/iotronic-lightning-rod/scripts/lr_configure.sh
+echo "After the installation execute lr_configure script in order to complete the Lightning-rod configuration!"
+echo "--> $NODE_PATH/@mdslab/iotronic-lightning-rod/scripts/lr_configure"
+echo "--> Usage: ./lr_configure -i"
+chmod +x $NODE_PATH/@mdslab/iotronic-lightning-rod/scripts/lr_configure
 echo "Bye!"
 echo "----------------------------------------------------------------------------------------------------------------"
 

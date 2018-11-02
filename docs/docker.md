@@ -30,19 +30,23 @@ sudo wget https://raw.githubusercontent.com/MDSLab/s4t-lightning-rod/master/util
 ```
 cd /tmp/
 
-wget https://raw.githubusercontent.com/MDSLab/s4t-lightning-rod/master/utils/install/docker/configure_LR_docker.sh -O lr_configure.sh
+wget https://raw.githubusercontent.com/MDSLab/s4t-lightning-rod/master/utils/install/docker/configure_LR_docker.sh -O lr_configure
 
-chmod +x lr_configure.sh
+chmod +x lr_configure
 
-lr_configure.sh <BOARD_ID> <BOARD_PASSWORD> <WAMP_URL> </CONFIG/PATH/>
+./lr_configure <BOARD_ID> <BOARD_PASSWORD> <WAMP_URL> <WSTUN_URL> </CONFIG/PATH/>
 ```
 This script asks the following information:
 ```
-* Board_ID: UUID released by the registration process managed by IoTronic.
+* Device ID: UUID released by the registration process managed by IoTronic.
 
-* Board password: password to log in to Iotronic
+* Device Iotronic password: password to log in to Iotronic
 
-* WAMP_URL: ws://<IP> or wss://<IP>
+* WAMP url: ws://<IP> or wss://<IP>
+
+* WSTUN url: ws://<IP> or wss://<IP>
+
+* Configuration files path: e.g. /etc/iotronic/
 ```
 
 ## Get container
@@ -52,10 +56,10 @@ points at the folder that you created in the first step (e.g: /etc/iotronic/):
 
 * for "x86_64":
 ```
-docker run -d -v lr_data:/var/lib/iotronic -v </CONFIG/PATH/>/settings.json:/var/lib/iotronic/settings.json -v </CONFIG/PATH/>/authentication.json:/etc/iotronic/authentication.json -net=host --name=lightning-rod mdslab/iotronic-lightning-rod
+docker run -d -v lr_data:/var/lib/iotronic -v </CONFIG/PATH/>/settings.json:/var/lib/iotronic/settings.json -v </CONFIG/PATH/>/authentication.json:/etc/iotronic/authentication.json --net=host --name=lightning-rod mdslab/iotronic-lightning-rod
 ```
 
 * for "ARMv7l" on Raspberry Pi 3:
 ```
-docker run -d -v lr_data:/var/lib/iotronic -v </CONFIG/PATH/>/settings.json:/var/lib/iotronic/settings.json -v </CONFIG/PATH/>/authentication.json:/etc/iotronic/authentication.json -net=host --name=lightning-rod mdslab/rpi-iotronic-lightning-rod
+docker run -d -v lr_data:/var/lib/iotronic -v </CONFIG/PATH/>/settings.json:/var/lib/iotronic/settings.json -v </CONFIG/PATH/>/authentication.json:/etc/iotronic/authentication.json --net=host --name=lightning-rod mdslab/rpi-iotronic-lightning-rod
 ```
